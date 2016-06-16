@@ -1,6 +1,7 @@
 import src.org.quickconnectfamily.json.*;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SandboxingJSONqcJSON {
@@ -48,8 +49,8 @@ public class SandboxingJSONqcJSON {
             BookBean book6 = new BookBean(0,"","",true);
 
             // read a null
-            File aNullFile = new File("");
-            FileInputStream aNullFileInputStream = new FileInputStream(aNullFile);
+            File anEmptyFile = new File("");
+            FileInputStream aNullFileInputStream = new FileInputStream(anEmptyFile); //FileNotFoundException
             JSONInputStream jsonInReadNull = new JSONInputStream(aNullFileInputStream);
             HashMap jsonReadingNull = (HashMap) jsonInReadNull.readObject();
 
@@ -57,7 +58,7 @@ public class SandboxingJSONqcJSON {
             jsonOut.writeObject(null);
 
             // write to an object that doesn't exist
-            jsonOut.writeObject(aNullFile);
+//            jsonOut.writeObject(book8); // Won't compile if I use a book that doesn't exist *frowny face*
 
             // use get method when printing out a title - use null
             System.out.println(jsonInHashmap.get(null));
@@ -73,9 +74,37 @@ public class SandboxingJSONqcJSON {
             writingTwiceJsonOut.writeObject(book7);
 
             // write to a file you don't have access to
-            
-            // write to a file that doesn't exist (no name)
-            //
+            File noAccessLloyd = new File("noAccessLloyd.json"); // new instance of a file
+            FileOutputStream noAccessLloydFileOutputStream = new FileOutputStream(noAccessLloyd);
+            FileInputStream noAccessLloydFileInputStream = new FileInputStream(noAccessLloyd);
+            JSONInputStream noAccessLloydJsonIn = new JSONInputStream(noAccessLloydFileInputStream);
+            JSONOutputStream noAccessLloydJsonOut = new JSONOutputStream(noAccessLloydFileOutputStream);
+            BookBean book8 = new BookBean(250,"Weird Al's Secret Lair","1988",false);
+            noAccessLloydJsonOut.writeObject(book8);
+
+            // read from a file you don't have access to
+            HashMap noAccessHashMap = (HashMap)noAccessLloydJsonIn.readObject();
+            System.out.println(noAccessHashMap.get("title"));
+
+            // what happens if you read an object that is empty? - an empty file?
+            File anotherEmptyFile = new File(""); // new instance of a file
+            FileOutputStream anotherEmptyFileFileOutputStream = new FileOutputStream(anotherEmptyFile);
+            FileInputStream anotherEmptyFileFileInputStream = new FileInputStream(anotherEmptyFile);
+            JSONInputStream anotherEmptyFileJsonIn = new JSONInputStream(anotherEmptyFileFileInputStream);
+            JSONOutputStream anotherEmptyFileJsonOut = new JSONOutputStream(anotherEmptyFileFileOutputStream);
+            BookBean book9 = new BookBean(423,"Gridlinked","2004",true);
+
+            ArrayList testingMyArrayList = (ArrayList)anotherEmptyFileJsonIn.readObject(); // Does this actually work?
+            HashMap testingMyHashMap = (HashMap)anotherEmptyFileJsonIn.readObject();
+
+            // what if the file isn't .json? uhh
+            File somethingPictureFile = new File("randomPicture.png");
+            FileOutputStream randomFileOutputStream = new FileOutputStream(somethingPictureFile);
+            FileInputStream randomFileInputStream = new FileInputStream(somethingPictureFile);
+            JSONInputStream randomJsonIn = new JSONInputStream(randomFileInputStream);
+            JSONOutputStream randomJsonOut = new JSONOutputStream(randomFileOutputStream);
+
+            HashMap testingDifferentFileExtensions = (HashMap)randomJsonIn.readObject();
 
         } catch (JSONException e) {
             e.printStackTrace();
